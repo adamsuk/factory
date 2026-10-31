@@ -10,6 +10,14 @@ that PR tags and publishes the release.
 
 ## [Unreleased]
 
+## 2026-10-31 (release notes)
+
+### Fixed
+
+- The review-depth entry (#15) sits with the 0.7.0 notes instead of a second
+  `## [Unreleased]` after the history, and the mutation-testing timeout is written
+  "25-minute".
+
 ## [0.7.0] - 2026-10-29
 
 ### 2026-10-29 (release provenance)
