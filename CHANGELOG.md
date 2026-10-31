@@ -58,7 +58,7 @@ that PR tags and publishes the release.
 - Report-only mutation testing: `.github/workflows/mutation.yml` runs `mutmut` (pinned `==3.8.1` in
   the new `mutation` extra in `pyproject.toml`) on the Python files under `src/factory` that a PR
   changes, and writes surviving mutants per file to the run's job summary. The job is
-  `continue-on-error`, has a 25 minute timeout, and its script always exits 0, so it cannot block merge.
+  `continue-on-error`, has a 25-minute timeout, and its script always exits 0, so it cannot block merge.
 
 ### 2026-10-29 (egress audit)
 
@@ -88,6 +88,12 @@ that PR tags and publishes the release.
   reported as drift.
 - Existing repos need `gh factory apply` to pick this up; a baseline change does
   not update already-applied rulesets.
+
+### 2026-10-27 (review depth)
+
+#### Added
+
+- Add size-label workflow baseline and review depth guidelines (#15)
 
 ## [0.6.0] - 2026-10-26
 
@@ -360,11 +366,3 @@ guard, nothing to host, and something anyone can reuse if it is open-sourced.
   Dependabot (`skip_authors` input).
 - Dependabot for this repo, keeping deliberate lower bounds in `pyproject.toml` (`increase-if-necessary`).
 - Python engine with tests against mocked API responses, plus CI (ruff, pytest, actionlint).
-
-## [Unreleased]
-
-### 2026-10-27 (review depth)
-
-#### Added
-
-- Add size-label workflow baseline and review depth guidelines (#15)
