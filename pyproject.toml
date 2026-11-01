@@ -2,7 +2,7 @@
 # and need nothing but python3 (3.10+): PyYAML is vendored in src/factory/_vendor.
 [project]
 name = "gh-factory"
-version = "0.6.0"
+version = "0.7.0"
 description = "gh CLI extension: apply a standard baseline to every repo carrying a topic"
 requires-python = ">=3.10"
 license = "MIT"

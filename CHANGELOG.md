@@ -10,9 +10,19 @@ that PR tags and publishes the release.
 
 ## [Unreleased]
 
-## 2026-10-29 (release provenance)
+## 2026-10-31 (release notes)
 
-### Added
+### Fixed
+
+- The review-depth entry (#15) sits with the 0.7.0 notes instead of a second
+  `## [Unreleased]` after the history, and the mutation-testing timeout is written
+  "25-minute".
+
+## [0.7.0] - 2026-10-29
+
+### 2026-10-29 (release provenance)
+
+#### Added
 
 - `release.yml` now creates each release as a draft, attaches
   `<repo>-<tag>-source.tar.gz` (a `git archive` of the released commit, with a slash in the tag
@@ -27,16 +37,16 @@ that PR tags and publishes the release.
   for a caller, one still missing them keeps its release and archive and only loses the
   attestation (a warning, not a red run).
 
-### Fixed
+#### Fixed
 
 - A rerun after a partial failure resumes the same draft release (re-pointed at `HEAD`) and
   re-uploads the archive (`--clobber`), rather than treating the existing tag as fully done.
 - A tag that already exists but points at a different commit than `HEAD` is left alone as
   unrelated, not resumed -- it is not this run's release to finish.
 
-## 2026-10-29 (dated changelog check)
+### 2026-10-29 (dated changelog check)
 
-### Fixed
+#### Fixed
 
 - The reusable `changelog.yml` check now verifies the form of the entry, not just
   that `CHANGELOG.md` was touched. The diff must add a `## YYYY-MM-DD` heading
@@ -49,26 +59,26 @@ that PR tags and publishes the release.
   added under a dated heading already in the file. Callers pin this workflow by SHA, so
   each enrolled repo must bump its pin to pick this up.
 
-## 2026-10-29 (mutation testing)
+### 2026-10-29 (mutation testing)
 
-### Added
+#### Added
 
 - Report-only mutation testing: `.github/workflows/mutation.yml` runs `mutmut` (pinned `==3.8.1` in
   the new `mutation` extra in `pyproject.toml`) on the Python files under `src/factory` that a PR
   changes, and writes surviving mutants per file to the run's job summary. The job is
-  `continue-on-error`, has a 25 minute timeout, and its script always exits 0, so it cannot block merge.
+  `continue-on-error`, has a 25-minute timeout, and its script always exits 0, so it cannot block merge.
 
-## 2026-10-29 (egress audit)
+### 2026-10-29 (egress audit)
 
-### Added
+#### Added
 
 - `step-security/harden-runner` (pinned to v2.22.3, `46b06cea07f9e64621fdf066ba77ac6915163d43`) is
   now the first step of every job in `ci.yml`, `codeql.yml` and `drift-check.yml`, in
   `egress-policy: audit` mode. This is the baseline; it does not block anything yet.
 
-## 2026-10-28 (owner bypass)
+### 2026-10-28 (owner bypass)
 
-### Fixed
+#### Fixed
 
 - The baseline ruleset grants one narrow bypass: `actor_type: User`,
   `actor_id: 25231418` (the account owning these repositories),
@@ -86,6 +96,12 @@ that PR tags and publishes the release.
   reported as drift.
 - Existing repos need `gh factory apply` to pick this up; a baseline change does
   not update already-applied rulesets.
+
+### 2026-10-27 (review depth)
+
+#### Added
+
+- Add size-label workflow baseline and review depth guidelines (#15)
 
 ## [0.6.0] - 2026-10-26
 
@@ -358,11 +374,3 @@ guard, nothing to host, and something anyone can reuse if it is open-sourced.
   Dependabot (`skip_authors` input).
 - Dependabot for this repo, keeping deliberate lower bounds in `pyproject.toml` (`increase-if-necessary`).
 - Python engine with tests against mocked API responses, plus CI (ruff, pytest, actionlint).
-
-## [Unreleased]
-
-### 2026-10-27 (review depth)
-
-#### Added
-
-- Add size-label workflow baseline and review depth guidelines (#15)
