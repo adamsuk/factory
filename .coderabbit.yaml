@@ -4,4 +4,4 @@
 # reviews.request_changes_workflow.)
 reviews:
   auto_approvals:
-    enabled: true
+    enabled: false
