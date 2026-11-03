@@ -10,6 +10,14 @@ that PR tags and publishes the release.
 
 ## [Unreleased]
 
+## 2026-11-03 (harden-runner audit)
+
+### Changed
+
+- `changelog.yml`, `pr-title.yml`, `release.yml` and `size-label.yml` start with
+  `step-security/harden-runner` in `egress-policy: audit` mode, pinned at the same commit as
+  `ci.yml`. `auto-release.yml` is unchanged: its job only calls `release.yml`.
+
 ## 2026-10-31 (release notes)
 
 ### Fixed
