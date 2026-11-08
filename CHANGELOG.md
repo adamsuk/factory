@@ -10,6 +10,13 @@ that PR tags and publishes the release.
 
 ## [Unreleased]
 
+## 2026-11-08 (codeql-action 4.39.3)
+
+### Changed
+
+- `github/codeql-action` baseline pin bumped to v4.39.3
+  (`33d7b85da1a04171e211befe2c739303b9a4c066`).
+
 ## 2026-11-03 (harden-runner audit)
 
 ### Changed
