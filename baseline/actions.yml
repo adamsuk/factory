@@ -5,5 +5,5 @@ actions/checkout:
   sha: 3d3c42e5aac5ba805825da76410c181273ba90b1
   version: v7.0.1
 github/codeql-action:
-  sha: 9b3254085494b55a0f7c4c2b3d2d52cc712ce370
-  version: v4.39.1
+  sha: 33d7b85da1a04171e211befe2c739303b9a4c066
+  version: v4.39.3
