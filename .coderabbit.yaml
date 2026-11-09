@@ -2,6 +2,13 @@
 # CodeRabbit approves PRs with no blocking findings and requests changes otherwise,
 # so its approval can be one part of the sign-off gate. (Replaces the deprecated
 # reviews.request_changes_workflow.)
+# Scott 9 Nov 2026: free-tier CodeRabbit only auto-reviews size/L and size/XL;
+# smaller PRs use thorough independent review (software-factory#317).
 reviews:
   auto_approvals:
     enabled: false
+  auto_review:
+    enabled: false
+    labels:
+      - size/L
+      - size/XL
