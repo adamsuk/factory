@@ -88,6 +88,10 @@ jobs:
     steps:
       - uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
+          # Still audit, on purpose (adamsuk/software-factory#305). Since this step was added, every run has
+          # taken the no-release path (github.com only). The publish path (release create, asset upload,
+          # attestation) has never run under Harden-Runner, so there is no audit log to build a list
+          # from, and a guessed list could lose a release. Switch to block from the first audited release.
           egress-policy: audit
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

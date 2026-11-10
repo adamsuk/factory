@@ -10,6 +10,27 @@ that PR tags and publishes the release.
 
 ## [Unreleased]
 
+## 2026-11-10 (harden-runner block)
+
+### Changed
+
+- Harden-Runner now blocks runner egress on gh-factory's own `ci.yml`, `codeql.yml`,
+  `drift-check.yml`, `changelog.yml`, `size-label.yml` and `pr-title.yml`: each step sets
+  `egress-policy: block` with an `allowed-endpoints` list copied from that job's audit-mode log.
+  `pr-title.yml` allows nothing, because its log shows no outbound call.
+- `release.yml` and `mutation.yml` stay on `audit`. Neither has run its real path under
+  Harden-Runner yet (no release has been published and no mutation run has happened since the
+  step was added), so there is no log to take a list from. Each switches after its first audited
+  run.
+- Repos that call `changelog.yml`, `pr-title.yml` or `size-label.yml` pin them by commit SHA, so
+  they keep the audit-mode copies until they move their pin. `baseline/` is unchanged.
+
+### Added
+
+- `tests/test_harden_runner_block.py` fails if one of these steps goes back to `audit`, gains a
+  wildcard or a non-443 endpoint, or if a workflow joins the audit-only exemption without the
+  test changing. README section "Runner egress" says how a host gets onto a list.
+
 ## 2026-11-08 (codeql-action 4.39.3)
 
 ### Changed

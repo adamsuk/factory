@@ -39,7 +39,10 @@ jobs:
     steps:
       - uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
-          egress-policy: audit
+          # Hosts from this job's Harden-Runner audit-mode log (adamsuk/software-factory#305).
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
       - name: Label PR by size
         env:
           GH_TOKEN: ${{ github.token }}
