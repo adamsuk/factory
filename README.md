@@ -303,6 +303,26 @@ everywhere, update `baseline/actions.yml` and re-apply. A test fails if
 gh-factory's own workflows and `baseline/actions.yml` disagree, so a Dependabot
 bump here can't silently diverge from the baseline.
 
+## Runner egress
+
+gh-factory's own workflows start with [StepSecurity Harden-Runner](https://github.com/step-security/harden-runner).
+On `ci.yml`, `codeql.yml`, `drift-check.yml`, `changelog.yml`, `size-label.yml` and `pr-title.yml`
+it runs with `egress-policy: block`: a job can reach only the hosts in that step's
+`allowed-endpoints`, and a call to any other host fails the job. `release.yml` and `mutation.yml`
+are still on `audit` (log only) until each has one audited run of its real path to take a list from.
+
+- **Where a list comes from.** Only from the job's audit-mode log: open the run's Harden-Runner
+  insights link (in the "Post Harden-Runner" step) and copy the hosts under Recommendations. Never
+  add a host because a job "probably" needs it, and never a wildcard.
+- **When a job goes red on a blocked host.** The run's insights page names the host. If the job
+  really needs it (a new dependency source, a moved download), add `host:443` to that step in the
+  same pull request and say why. `tests/test_harden_runner_block.py` keeps the lists sorted,
+  exact and on port 443.
+- **Other repos.** The reusable workflows here are pinned by commit SHA in every caller, so
+  callers keep the copy they pinned until they move the pin. This covers GitHub-hosted runners
+  only. A self-hosted machine that runs agents needs its own host firewall allowlist; nothing in
+  this repo sets that.
+
 ## Reusable changelog check
 
 [`.github/workflows/changelog.yml`](.github/workflows/changelog.yml) fails a PR

@@ -27,7 +27,10 @@ jobs:
     steps:
       - uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
-          egress-policy: audit
+          # The audit-mode log for this job shows no outbound destination at all, so nothing is
+          # allowed (adamsuk/software-factory#305). Add a host here only from a log that shows it.
+          egress-policy: block
+          allowed-endpoints: ""
       - name: Check the PR title is a Conventional Commit
         env:
           TITLE: ${{ github.event.pull_request.title }}
