@@ -13,8 +13,8 @@ topic: factory
 codeowners:
   - "@adamsuk"
 
-# Required approving reviews on the default branch. Default: 0.
-approvals: 0
+# Required approving reviews on the default branch. Default: 1.
+approvals: 1
 
 # Required status checks for every repo. Default: none. Usually better set per repo
 # in .github/factory.yml, because check names differ between repos.

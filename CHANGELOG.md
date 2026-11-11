@@ -10,6 +10,32 @@ that PR tags and publishes the release.
 
 ## [Unreleased]
 
+## 2026-11-11 (baseline matches the live rulesets)
+
+### Changed
+
+- The built-in `factory-main` ruleset now encodes what is live on the enrolled repos, so
+  `gh factory apply` no longer weakens them (adamsuk/software-factory#323):
+  - `require_last_push_approval` is `true` (was `false`);
+  - `require_code_owner_review` defaults to `true` (was `false`); a repo can still set
+    `require_code_owner_review: false` in its `.github/factory.yml`;
+  - `strict_required_status_checks_policy` is `true` (was `false`), so a branch must be up to
+    date before it merges;
+  - required approvals default to 1 (was 0); `approvals:` in the config file or in a repo's
+    `.github/factory.yml` still overrides it.
+
+### Removed
+
+- The owner bypass actor in `baseline/ruleset.yml`. The baseline lists no bypass actors, so
+  nobody, the owner included, merges past the ruleset, and a bypass actor added by hand is
+  reported as drift. A custom baseline can still list `bypass_actors`.
+
+### Added
+
+- Tests that pin the shipped baseline's pull-request and status-check parameters, that a ruleset
+  shaped like the live ones plans no `ruleset` change, and that the per-repo `approvals` and
+  `require_code_owner_review` overrides still relax the new defaults.
+
 ## 2026-11-10 (harden-runner block)
 
 ### Changed

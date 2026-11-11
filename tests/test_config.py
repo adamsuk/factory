@@ -25,7 +25,7 @@ def test_defaults_use_the_authenticated_user(tmp_path):
     cfg = resolve_config(None, None, None, lambda: "octocat", env_for(tmp_path))
     assert cfg.owners == ["octocat"]
     assert cfg.codeowners == ["@octocat"]
-    assert cfg.topic == "factory" and cfg.approvals == 0 and cfg.required_checks == []
+    assert cfg.topic == "factory" and cfg.approvals == 1 and cfg.required_checks == []
     assert cfg.baseline is None and cfg.source == "built-in defaults"
 
 

@@ -1,6 +1,7 @@
 import pytest
 
 from factory.client import ReadOnlyViolation
+from factory.config import FactoryConfig
 from factory.plan import desired_ruleset, plan_repo, ruleset_diff
 from factory.render import render_codeowners, render_template
 
@@ -45,22 +46,87 @@ def test_fresh_repo_plans_everything_and_writes_nothing(cfg, baseline):
     assert "allow_squash_merge" not in settings  # already true
 
 
-def test_owner_bypass_reaches_the_desired_ruleset(baseline):
-    """The baseline's bypass actor must actually be applied.
+def test_shipped_baseline_has_no_bypass_actor(baseline):
+    """Nobody bypasses the shipped ruleset, the owner included.
 
-    desired_ruleset hardcoded "bypass_actors": [], so no repo could have one and
-    the owner of a single-maintainer estate could not merge his own pull request
-    over a review bot's objection: GitHub blocks on an outstanding
-    changes-requested regardless of required_approving_review_count, which is 0
-    here. It happened on adamsuk/activity-feed#20 and adamsuk/gh-factory#34.
+    The live `factory-main` rulesets carry no bypass actor and the maintainer
+    decided they are right (adamsuk/software-factory#323). An owner bypass in
+    baseline/ruleset.yml would have `gh factory apply` weaken every one of them.
 
     The baseline fixture loads the shipped baseline/ruleset.yml, so this pins
-    what is really applied, including the narrow mode.
+    what is really applied.
     """
     actors = desired_ruleset(baseline, 0, [])["bypass_actors"]
-    assert actors == [{"actor_type": "User", "actor_id": 25231418, "bypass_mode": "pull_request"}]
-    # pull_request, not always: direct pushes to the default branch stay blocked.
+    assert actors == []
+    # Never `always`: direct pushes to the default branch stay blocked.
     assert all(a["bypass_mode"] != "always" for a in actors)
+
+
+def test_shipped_baseline_matches_the_live_pull_request_and_check_rules(baseline):
+    """The shipped baseline encodes what is live on the enrolled repos (adamsuk/software-factory#323)."""
+    rules = {r["type"]: r for r in desired_ruleset(baseline, FactoryConfig().approvals, ["test"])["rules"]}
+    assert rules["pull_request"]["parameters"] == {
+        "required_approving_review_count": 1,
+        "dismiss_stale_reviews_on_push": False,
+        "require_code_owner_review": True,
+        "require_last_push_approval": True,
+        "required_review_thread_resolution": False,
+        "allowed_merge_methods": ["squash"],
+    }
+    assert rules["required_status_checks"]["parameters"]["strict_required_status_checks_policy"] is True
+    assert set(rules) == {"deletion", "non_fast_forward", "pull_request", "required_status_checks"}
+
+
+def test_live_ruleset_shape_is_not_drift(cfg, baseline):
+    """A ruleset as GitHub returns it for the live repos plans no ruleset change.
+
+    GitHub also returns `require_extra_approval_for_unattributed_changes`, which the
+    factory does not model; an extra key on the live side is ignored.
+    """
+    live = {
+        "id": 7,
+        "name": "factory-main",
+        "target": "branch",
+        "source_type": "Repository",
+        "enforcement": "active",
+        "bypass_actors": [],
+        "conditions": {"ref_name": {"include": ["~DEFAULT_BRANCH"], "exclude": []}},
+        "rules": [
+            {"type": "deletion"},
+            {"type": "non_fast_forward"},
+            {
+                "type": "pull_request",
+                "parameters": {
+                    "allowed_merge_methods": ["squash"],
+                    "dismiss_stale_reviews_on_push": False,
+                    "require_code_owner_review": True,
+                    "require_extra_approval_for_unattributed_changes": True,
+                    "require_last_push_approval": True,
+                    "required_approving_review_count": 1,
+                    "required_review_thread_resolution": False,
+                },
+            },
+            {
+                "type": "required_status_checks",
+                "parameters": {
+                    "strict_required_status_checks_policy": True,
+                    "required_status_checks": [{"context": "changelog"}, {"context": "test"}],
+                },
+            },
+        ],
+    }
+    files = {".github/factory.yml": "required_checks: [test, changelog]\n"}
+    plan = plan_repo(FakeClient(repo_routes(rulesets=[live], files=files)), cfg, baseline, FULL)
+    assert [c for c in plan.changes if c.item == "ruleset"] == []
+
+
+def test_repo_overrides_still_relax_the_stricter_defaults(cfg, baseline):
+    override = "approvals: 0\nrequire_code_owner_review: false\n"
+    plan = plan_repo(FakeClient(repo_routes(files={".github/factory.yml": override})), cfg, baseline, FULL)
+    change = next(c for c in plan.changes if c.item == "ruleset")
+    pr = {r["type"]: r for r in change.payload["body"]["rules"]}["pull_request"]["parameters"]
+    assert pr["required_approving_review_count"] == 0
+    assert pr["require_code_owner_review"] is False
 
 
 def test_malformed_bypass_actors_are_dropped(baseline):
@@ -81,8 +147,12 @@ def test_bypass_actor_drift_is_reported_both_ways(baseline):
 
     The old rule reported any bypass actor as drift, which is what made a
     bypass impossible to express. One added by hand must still be corrected.
+
+    The shipped baseline has no bypass actor, so this one is added to the
+    fixture to keep both directions covered.
     """
-    desired = desired_ruleset(baseline, 0, [])
+    rs = {**baseline.ruleset, "bypass_actors": [{"actor_type": "User", "actor_id": 25231418, "bypass_mode": "pull_request"}]}
+    desired = desired_ruleset(baseline.__class__(**{**baseline.__dict__, "ruleset": rs}), 0, [])
 
     matching = {"id": 7, **desired, "source_type": "Repository"}
     assert "bypass_actors" not in ruleset_diff(matching, desired)
@@ -117,7 +187,7 @@ def test_dry_run_client_refuses_writes():
 
 
 def test_compliant_repo_is_a_no_op(cfg, baseline):
-    desired = desired_ruleset(baseline, 0, [])
+    desired = desired_ruleset(baseline, cfg.approvals, [])
     ruleset = {"id": 7, **desired, "source_type": "Repository"}
     labels = [{"name": lbl["name"], "color": lbl["color"], "description": lbl["description"]} for lbl in baseline.labels]
     files = {
@@ -283,15 +353,15 @@ def test_codeowner_paths_and_required_code_owner_review(cfg, baseline):
     assert "code-owner review" in change.detail
 
 
-def test_code_owner_review_stays_off_by_default(cfg, baseline):
+def test_code_owner_review_is_on_by_default(cfg, baseline):
     plan = plan_repo(FakeClient(repo_routes()), cfg, baseline, FULL)
     assert plan.files[".github/CODEOWNERS"].splitlines()[1:] == ["* @adamsuk", "/.github/ @adamsuk"]
     rules = {r["type"]: r for r in desired_ruleset(baseline, 0, [])["rules"]}
-    assert rules["pull_request"]["parameters"]["require_code_owner_review"] is False
+    assert rules["pull_request"]["parameters"]["require_code_owner_review"] is True
 
 
 def test_existing_ruleset_without_code_owner_review_is_updated(cfg, baseline):
-    existing = {"id": 3, **desired_ruleset(baseline, 0, [])}
+    existing = {"id": 3, **desired_ruleset(baseline, 0, [], False)}
     assert ruleset_diff(existing, desired_ruleset(baseline, 0, [], True)) == ["rule pull_request"]
 
 
