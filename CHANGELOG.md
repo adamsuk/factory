@@ -10,15 +10,17 @@ that PR tags and publishes the release.
 
 ## [Unreleased]
 
-## 2026-11-11 (merge queue ready)
+## [0.7.1] - 2026-11-11
 
-### Changed
+### 2026-11-11 (merge queue ready)
+
+#### Changed
 
 - The Changelog, CI, CodeQL and PR title workflows, and the baseline `changelog.yml` template, now also trigger on `merge_group`, so required checks report on a merge queue's temporary branch. Without this, enabling the queue would leave every required check pending and stall merges (adamsuk/software-factory#312). The reusable changelog and PR title jobs already pass when there is no pull request.
 
-## 2026-11-11 (baseline matches the live rulesets)
+### 2026-11-11 (baseline matches the live rulesets)
 
-### Changed
+#### Changed
 
 - The built-in `factory-main` ruleset now encodes what is live on the enrolled repos, so
   `gh factory apply` no longer weakens them (adamsuk/software-factory#323):
@@ -30,21 +32,21 @@ that PR tags and publishes the release.
   - required approvals default to 1 (was 0); `approvals:` in the config file or in a repo's
     `.github/factory.yml` still overrides it.
 
-### Removed
+#### Removed
 
 - The owner bypass actor in `baseline/ruleset.yml`. The baseline lists no bypass actors, so
   nobody, the owner included, merges past the ruleset, and a bypass actor added by hand is
   reported as drift. A custom baseline can still list `bypass_actors`.
 
-### Added
+#### Added
 
 - Tests that pin the shipped baseline's pull-request and status-check parameters, that a ruleset
   shaped like the live ones plans no `ruleset` change, and that the per-repo `approvals` and
   `require_code_owner_review` overrides still relax the new defaults.
 
-## 2026-11-10 (harden-runner block)
+### 2026-11-10 (harden-runner block)
 
-### Changed
+#### Changed
 
 - Harden-Runner now blocks runner egress on gh-factory's own `ci.yml`, `codeql.yml`,
   `drift-check.yml`, `changelog.yml`, `size-label.yml` and `pr-title.yml`: each step sets
@@ -57,30 +59,30 @@ that PR tags and publishes the release.
 - Repos that call `changelog.yml`, `pr-title.yml` or `size-label.yml` pin them by commit SHA, so
   they keep the audit-mode copies until they move their pin. `baseline/` is unchanged.
 
-### Added
+#### Added
 
 - `tests/test_harden_runner_block.py` fails if one of these steps goes back to `audit`, gains a
   wildcard or a non-443 endpoint, or if a workflow joins the audit-only exemption without the
   test changing. README section "Runner egress" says how a host gets onto a list.
 
-## 2026-11-08 (codeql-action 4.39.3)
+### 2026-11-08 (codeql-action 4.39.3)
 
-### Changed
+#### Changed
 
 - `github/codeql-action` baseline pin bumped to v4.39.3
   (`33d7b85da1a04171e211befe2c739303b9a4c066`).
 
-## 2026-11-03 (harden-runner audit)
+### 2026-11-03 (harden-runner audit)
 
-### Changed
+#### Changed
 
 - `changelog.yml`, `pr-title.yml`, `release.yml` and `size-label.yml` start with
   `step-security/harden-runner` in `egress-policy: audit` mode, pinned at the same commit as
   `ci.yml`. `auto-release.yml` is unchanged: its job only calls `release.yml`.
 
-## 2026-10-31 (release notes)
+### 2026-10-31 (release notes)
 
-### Fixed
+#### Fixed
 
 - The review-depth entry (#15) sits with the 0.7.0 notes instead of a second
   `## [Unreleased]` after the history, and the mutation-testing timeout is written
