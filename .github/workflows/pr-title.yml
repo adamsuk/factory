@@ -8,6 +8,7 @@ name: PR title
 #       uses: adamsuk/gh-factory/.github/workflows/pr-title.yml@<commit-sha> # vX.Y.Z
 # and may pass `types`. It also checks this repo's own PRs.
 on:
+  merge_group:
   pull_request:
     types: [opened, edited, synchronize, reopened]
   workflow_call:

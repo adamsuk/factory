@@ -10,6 +10,12 @@ that PR tags and publishes the release.
 
 ## [Unreleased]
 
+## 2026-11-11 (merge queue ready)
+
+### Changed
+
+- The Changelog, CI, CodeQL and PR title workflows, and the baseline `changelog.yml` template, now also trigger on `merge_group`, so required checks report on a merge queue's temporary branch. Without this, enabling the queue would leave every required check pending and stall merges (adamsuk/software-factory#312). The reusable changelog and PR title jobs already pass when there is no pull request.
+
 ## 2026-11-11 (baseline matches the live rulesets)
 
 ### Changed

@@ -7,6 +7,7 @@ name: Changelog
 #       uses: adamsuk/gh-factory/.github/workflows/changelog.yml@<commit-sha> # v0.1.0
 # and may pass `changelog_file`, `skip_label` and `skip_authors`. It also checks this repo's own PRs.
 on:
+  merge_group:
   pull_request:
     types: [opened, synchronize, reopened, labeled, unlabeled]
   workflow_call:
