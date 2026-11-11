@@ -215,9 +215,8 @@ def _bypass_actors(rs: dict) -> list[dict]:
     """The baseline's bypass actors, normalised and dropping anything malformed.
 
     An entry needs all three fields to mean anything to the API, so a partial one
-    is dropped rather than sent. Previously this was hardcoded to [], which is
-    why no repo could have a bypass actor and the owner of a single-maintainer
-    estate could not merge over a review bot's objection.
+    is dropped rather than sent. The built-in baseline lists none; a custom
+    baseline may.
     """
     out: list[dict] = []
     for actor in rs.get("bypass_actors") or []:
@@ -259,11 +258,10 @@ def ruleset_diff(existing: dict, desired: dict) -> list[str]:
     for k in ("target", "enforcement", "conditions"):
         if not _subset(desired[k], existing.get(k)):
             reasons.append(k)
-    # Compared against the baseline rather than required to be empty. The old
-    # rule reported any bypass actor as drift, which is what made a bypass
-    # impossible to express. Drift is still reported when a repo's actors differ
-    # from the baseline's, in either direction, so one added by hand is still
-    # corrected.
+    # Compared against the baseline's list (empty in the built-in baseline), so a
+    # custom baseline can express a bypass. Drift is reported when a repo's actors
+    # differ from the baseline's, in either direction, so one added by hand is
+    # still corrected.
     if _bypass_key(existing.get("bypass_actors")) != _bypass_key(desired.get("bypass_actors")):
         reasons.append("bypass_actors")
     have = {r.get("type"): r for r in existing.get("rules") or []}

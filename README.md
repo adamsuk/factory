@@ -79,7 +79,7 @@ confirmation declined.
 | Squash merge only, PR title/body as the commit, branches deleted after merge. Auto-merge is allowed only when the repo has at least one required check; with none, a PR set to auto-merge would merge instantly, so it is kept (or turned) off | `settings` | API, in place |
 | Secret scanning and push protection, where GitHub offers it | `secret-scanning` | API, in place |
 | Dependabot vulnerability alerts | `vulnerability-alerts` | API, in place |
-| Ruleset `factory-main` on the default branch: PR required (0 approvals by default), required checks from config (none by default), no force-push, no deletion | `ruleset` | API; updated in place, other rulesets never touched |
+| Ruleset `factory-main` on the default branch: PR required (1 approval, code-owner review and approval of the last push by default), required checks from config (none by default; strict, so the branch must be up to date), no bypass actors, no force-push, no deletion | `ruleset` | API; updated in place, other rulesets never touched |
 | Labels `skip-changelog`, `cutting edge`, `dependencies`, `github_actions`, `factory`, station status `factory:triage`, `factory:ready`, `factory:building`, `factory:gate`, `factory:review`, `factory:merge`, `factory:release`, `factory:done`, `factory:blocked`, and `bug`, `enhancement`, `documentation` | `labels` | API; created or updated, others never deleted |
 | `.github/pull_request_template.md` with a "CHANGELOG.md updated, if this repo keeps one" checkbox (reads correctly as an org-wide default template too) | `pr-template` | one PR |
 | `.github/ISSUE_TEMPLATE/task.yml` issue form with acceptance criteria | `issue-template` | one PR |
@@ -111,7 +111,7 @@ Plan statuses: **create / update / enable / open-pr / update-pr** (changes),
 Settings are resolved in this order, later ones winning:
 
 1. **Built-in defaults.** The owner is you (the authenticated `gh` user), the
-   topic is `factory`, CODEOWNERS is `@you`, approvals are 0, and there are no
+   topic is `factory`, CODEOWNERS is `@you`, approvals are 1, and there are no
    required checks.
 2. **A config file.** `--config FILE`, else `$GH_FACTORY_CONFIG`, else
    `~/.config/gh-factory/config.yml` (or `$XDG_CONFIG_HOME/gh-factory/config.yml`)
@@ -123,7 +123,7 @@ Settings are resolved in this order, later ones winning:
 owners: [my-org, my-user]       # accounts searched for enrolled repos
 topic: factory                  # enrolment topic
 codeowners: ["@my-user"]        # CODEOWNERS entries
-approvals: 0                    # required approving reviews (0-10)
+approvals: 1                    # required approving reviews (0-10)
 required_checks: []             # status checks required on every repo
 baseline: ./my-baseline         # custom baseline; relative to this file
 sync_branch: factory/sync
@@ -154,7 +154,7 @@ codeowners:
 codeowner_paths:      # own these paths instead of `*` (`/.github/` is always owned)
   - /AGENTS.md
   - /.claude/
-require_code_owner_review: true   # default: the baseline ruleset's value (false)
+require_code_owner_review: true   # default: the baseline ruleset's value (true)
 agents:               # what the factory agents may do here; see "Agents" below
   merge: false
 ```

@@ -58,7 +58,7 @@ class FactoryConfig:
     # Empty owners / codeowners mean "the authenticated gh user"; resolve_config fills them in.
     owners: list[str] = field(default_factory=list)
     topic: str = "factory"
-    approvals: int = 0
+    approvals: int = 1
     codeowners: list[str] = field(default_factory=list)
     required_checks: list[str] = field(default_factory=list)
     sync_branch: str = "factory/sync"
