@@ -21,10 +21,13 @@ jobs:
     steps:
       - uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
-          # Still audit, on purpose (adamsuk/software-factory#305). This job has not run since the step was
-          # added, so there is no audit-mode log to build a list from. It is report-only and not a
-          # required check. Switch to block from its first audited run.
-          egress-policy: audit
+          # Hosts copied from the Harden-Runner insights of a run of this job
+          # (https://github.com/adamsuk/gh-factory/actions/runs/43237826346).
+          egress-policy: block
+          allowed-endpoints: >
+            files.pythonhosted.org:443
+            github.com:443
+            pypi.org:443
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
