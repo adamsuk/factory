@@ -2,9 +2,9 @@
 
 Every `step-security/harden-runner` step in `.github/workflows/*.yml` (the copies under
 `baseline/` are other repos' and are not read here) must run with `egress-policy: block` and an
-`allowed-endpoints` list taken from that job's audit-mode log. Two workflows have never run
-their real path under Harden-Runner, so there is no log to build a list from; they stay on
-`audit` and are named below, so the exemption cannot grow without this file changing.
+`allowed-endpoints` list taken from that job's audit-mode log. A workflow with no log of its
+real path may stay on `audit` only if it is named in `AUDIT_UNTIL_LOGGED` below (empty now), so
+the exemption cannot grow without this file changing.
 """
 
 import re
@@ -18,7 +18,8 @@ from .conftest import ROOT
 WORKFLOWS = ROOT / ".github" / "workflows"
 
 # Still `audit`: no audit-mode log of the job's real path exists yet (adamsuk/software-factory#305).
-AUDIT_UNTIL_LOGGED = {"mutation.yml", "release.yml"}
+# Empty since release.yml and mutation.yml were logged (adamsuk/software-factory#321).
+AUDIT_UNTIL_LOGGED: set[str] = set()
 # `block` with nothing allowed: the audit-mode log shows the job makes no outbound call.
 NO_EGRESS = {"pr-title.yml"}
 # Calls release.yml and has no step of its own (adamsuk/software-factory#273).
