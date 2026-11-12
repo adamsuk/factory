@@ -10,9 +10,9 @@ that PR tags and publishes the release.
 
 ## [Unreleased]
 
-### 2026-11-12 (block egress on release and mutation)
+## 2026-11-12 (block egress on release and mutation)
 
-#### Changed
+### Changed
 
 - `release.yml` and `mutation.yml` now run Harden-Runner with `egress-policy: block`, with `allowed-endpoints` copied from the audited runs [43238355252](https://github.com/adamsuk/gh-factory/actions/runs/43238355252) (publish path, v0.7.1) and [43237826346](https://github.com/adamsuk/gh-factory/actions/runs/43237826346). `AUDIT_UNTIL_LOGGED` in `tests/test_harden_runner_block.py` is now empty, so every gh-factory workflow with a step blocks egress (adamsuk/software-factory#321). Other repos that call `release.yml` at a pinned SHA are unaffected until they move the pin.
 
